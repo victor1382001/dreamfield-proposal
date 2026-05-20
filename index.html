@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="新田接案">
+<meta name="theme-color" content="#1a1a1a">
+<title>新田接案系統｜新田創意整合</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green: #2E7D32;
+  --green-light: #4CAF50;
+  --green-dim: #1B5E20;
+  --green-bg: #E8F5E9;
+  --green-bg2: #C8E6C9;
+  --amber: #F57F17;
+  --amber-bg: #FFF8E1;
+  --teal: #00695C;
+  --teal-bg: #E0F2F1;
+  --purple-bg: #EDE7F6;
+  --purple: #4527A0;
+  --coral-bg: #FBE9E7;
+  --coral: #BF360C;
+  --ink: #1a1a1a;
+  --ink2: #3d3d3d;
+  --ink3: #6b6b6b;
+  --ink4: #9e9e9e;
+  --surface: #ffffff;
+  --surface2: #f7f5f0;
+  --surface3: #efede8;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.14);
+  --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  --shadow-lg: 0 8px 32px rgba(0,0,0,0.12);
+  --radius: 12px;
+  --radius-sm: 8px;
+  --radius-pill: 999px;
+  --serif: 'Noto Serif TC', serif;
+  --sans: 'Noto Sans TC', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+html { font-size: 16px; scroll-behavior: smooth; }
+
+body {
+  font-family: var(--sans);
+  background: var(--surface2);
+  color: var(--ink);
+  min-height: 100dvh;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Header ── */
+.app-header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: var(--ink);
+  color: #fff;
+  padding: 14px 20px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.app-logo {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #fff;
+}
+.app-logo span {
+  color: #81C784;
+  font-weight: 400;
+}
+.app-badge {
+  font-size: 11px;
+  background: var(--green);
+  color: #fff;
+  padding: 3px 9px;
+  border-radius: var(--radius-pill);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* ── Step nav ── */
+.step-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 0 16px;
+  display: flex;
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  gap: 0;
+}
+.step-bar::-webkit-scrollbar { display: none; }
+.step-btn {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 10px 14px 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  position: relative;
+  font-family: var(--sans);
+  color: var(--ink4);
+  font-size: 11px;
+  font-weight: 400;
+  white-space: nowrap;
+  transition: color .2s;
+}
+.step-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 8px; right: 8px;
+  height: 2px;
+  background: transparent;
+  border-radius: 2px 2px 0 0;
+  transition: background .2s;
+}
+.step-btn.active { color: var(--green); font-weight: 500; }
+.step-btn.active::after { background: var(--green); }
+.step-btn.done { color: var(--ink3); }
+.step-dot {
+  width: 22px; height: 22px;
+  border-radius: 50%;
+  background: var(--surface3);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+  color: var(--ink4);
+  transition: all .2s;
+}
+.step-btn.active .step-dot { background: var(--green); color: #fff; }
+.step-btn.done .step-dot { background: var(--green-dim); color: #fff; }
+
+/* ── Progress ── */
+.prog-wrap { height: 3px; background: var(--surface3); }
+.prog-fill { height: 100%; background: var(--green); transition: width .35s cubic-bezier(.4,0,.2,1); }
+
+/* ── Content ── */
+.content { padding: 20px 16px 100px; max-width: 600px; margin: 0 auto; }
+.panel { display: none; }
+.panel.active { display: block; }
+
+/* ── Section title ── */
+.sec-title {
+  font-family: var(--serif);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--ink);
+  margin-bottom: 4px;
+}
+.sec-sub { font-size: 12px; color: var(--ink4); margin-bottom: 20px; font-weight: 300; }
+
+/* ── Field ── */
+.field { margin-bottom: 16px; }
+.field label {
+  display: block;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--ink3);
+  margin-bottom: 6px;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.field input[type=text],
+.field input[type=date],
+.field textarea,
+.field select {
+  width: 100%;
+  padding: 11px 13px;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 15px;
+  font-family: var(--sans);
+  transition: border-color .15s, box-shadow .15s;
+  -webkit-appearance: none;
+  appearance: none;
+}
+.field input:focus, .field textarea:focus, .field select:focus {
+  outline: none;
+  border-color: var(--green);
+  box-shadow: 0 0 0 3px rgba(46,125,50,.12);
+}
+.field textarea { resize: vertical; min-height: 70px; line-height: 1.6; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+/* ── Chips ── */
+.chip-group { display: flex; flex-wrap: wrap; gap: 7px; }
+.chip {
+  padding: 6px 12px;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-pill);
+  font-size: 13px;
+  cursor: pointer;
+  background: var(--surface);
+  color: var(--ink3);
+  font-family: var(--sans);
+  font-weight: 400;
+  transition: all .15s;
+  user-select: none;
+  -webkit-user-select: none;
+}
+.chip:active { transform: scale(0.96); }
+.chip.sel {
+  background: var(--green-bg);
+  border-color: var(--green);
+  color: var(--green-dim);
+  font-weight: 500;
+}
+
+/* ── Budget cards ── */
+.budget-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+.bcard {
+  padding: 14px 12px;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  cursor: pointer;
+  background: var(--surface);
+  text-align: center;
+  transition: all .15s;
+}
+.bcard:active { transform: scale(0.97); }
+.bcard.sel { background: var(--green-bg); border-color: var(--green); border-width: 1.5px; }
+.bcard .b-amt { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 3px; font-family: var(--serif); }
+.bcard .b-desc { font-size: 11px; color: var(--ink4); }
+.bcard.sel .b-amt { color: var(--green-dim); }
+.bcard.sel .b-desc { color: var(--green); }
+
+/* ── Role cards ── */
+.role-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 9px; }
+.rcard {
+  padding: 12px;
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: var(--surface);
+  transition: all .15s;
+}
+.rcard:active { transform: scale(0.97); }
+.rcard.sel { background: var(--green-bg); border-color: var(--green); }
+.rcard.locked { cursor: default; }
+.rcard .r-title { font-size: 13px; font-weight: 500; color: var(--ink); margin-bottom: 2px; display: flex; align-items: center; gap: 6px; }
+.rcard.sel .r-title { color: var(--green-dim); }
+.rcard .r-desc { font-size: 11px; color: var(--ink4); line-height: 1.4; }
+.you-badge {
+  font-size: 9px;
+  background: var(--green-dim);
+  color: #fff;
+  padding: 1px 5px;
+  border-radius: var(--radius-pill);
+  font-weight: 700;
+}
+
+/* ── Buttons ── */
+.btn-row { display: flex; gap: 8px; margin-top: 24px; }
+.btn {
+  padding: 12px 22px;
+  border-radius: var(--radius-sm);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  font-family: var(--sans);
+  transition: all .15s;
+  border: none;
+  display: flex; align-items: center; gap: 6px;
+}
+.btn:active { transform: scale(0.97); }
+.btn-back {
+  background: var(--surface);
+  border: 1px solid var(--border2);
+  color: var(--ink3);
+}
+.btn-back:hover { background: var(--surface3); }
+.btn-next {
+  flex: 1;
+  background: var(--ink);
+  color: #fff;
+  justify-content: center;
+}
+.btn-next:hover { background: var(--green-dim); }
+.btn-generate {
+  flex: 1;
+  background: var(--green);
+  color: #fff;
+  justify-content: center;
+  font-size: 15px;
+  padding: 14px;
+  border-radius: var(--radius);
+}
+.btn-generate:hover { background: var(--green-dim); }
+
+/* ── Result cards ── */
+.rc {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.rc-head { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.rc-icon {
+  width: 34px; height: 34px;
+  border-radius: var(--radius-sm);
+  background: var(--green-bg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  flex-shrink: 0;
+}
+.rc-title { font-size: 14px; font-weight: 700; color: var(--ink); font-family: var(--serif); }
+.rc-sub { font-size: 12px; color: var(--ink4); margin-top: 1px; }
+
+.sum-row { display: flex; justify-content: space-between; align-items: baseline; padding: 6px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+.sum-row:last-child { border-bottom: none; }
+.sum-k { color: var(--ink4); flex-shrink: 0; }
+.sum-v { color: var(--ink); font-weight: 500; text-align: right; max-width: 65%; word-break: break-all; }
+
+.tag { display: inline-block; padding: 3px 9px; border-radius: var(--radius-pill); font-size: 11px; font-weight: 500; margin: 2px; }
+.t-green { background: var(--green-bg); color: var(--green-dim); }
+.t-purple { background: var(--purple-bg); color: var(--purple); }
+.t-amber { background: var(--amber-bg); color: var(--amber); }
+.t-teal { background: var(--teal-bg); color: var(--teal); }
+.t-coral { background: var(--coral-bg); color: var(--coral); }
+
+.mrow { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.mrow:last-child { border-bottom: none; }
+.av {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700;
+  flex-shrink: 0;
+}
+.m-name { font-size: 13px; font-weight: 500; color: var(--ink); }
+.m-role { font-size: 12px; color: var(--ink4); }
+.m-badge { font-size: 11px; padding: 2px 8px; border-radius: var(--radius-pill); flex-shrink: 0; }
+.m-you { background: var(--green-bg); color: var(--green-dim); font-weight: 600; }
+.m-need { background: var(--amber-bg); color: var(--amber); font-weight: 600; }
+
+.step-item { display: flex; align-items: flex-start; gap: 10px; padding: 7px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--ink2); }
+.step-item:last-child { border-bottom: none; }
+.step-num {
+  width: 20px; height: 20px;
+  border-radius: 50%;
+  background: var(--surface3);
+  border: 1px solid var(--border2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 700; color: var(--ink4);
+  flex-shrink: 0; margin-top: 1px;
+}
+
+.send-btn {
+  width: 100%;
+  padding: 15px;
+  background: var(--ink);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 700;
+  font-family: var(--serif);
+  cursor: pointer;
+  transition: all .15s;
+  margin-top: 4px;
+  letter-spacing: 0.02em;
+}
+.send-btn:hover { background: var(--green-dim); }
+.send-btn:active { transform: scale(0.98); }
+
+/* ── Install banner ── */
+.install-banner {
+  position: fixed;
+  bottom: 20px; left: 16px; right: 16px;
+  background: var(--ink);
+  color: #fff;
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: var(--shadow-lg);
+  z-index: 200;
+  max-width: 560px;
+  margin: 0 auto;
+}
+.install-banner.hidden { display: none; }
+.install-text { flex: 1; }
+.install-title { font-size: 14px; font-weight: 700; font-family: var(--serif); margin-bottom: 2px; }
+.install-sub { font-size: 12px; color: rgba(255,255,255,0.65); }
+.install-btn {
+  background: var(--green);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  font-family: var(--sans);
+  flex-shrink: 0;
+}
+.install-close {
+  background: none; border: none; color: rgba(255,255,255,0.5);
+  font-size: 18px; cursor: pointer; flex-shrink: 0; padding: 0 2px;
+}
+
+/* ── Divider ── */
+.divider { height: 1px; background: var(--border); margin: 20px 0; }
+
+/* ── Hint text ── */
+.hint { font-size: 11px; color: var(--ink4); margin-top: 5px; }
+
+/* ── Result actions ── */
+.result-actions { display: flex; gap: 8px; margin-top: 8px; }
+.result-actions .btn-back { flex: 1; justify-content: center; font-size: 13px; padding: 10px; }
+
+/* ── Responsive ── */
+@media (min-width: 600px) {
+  .content { padding: 28px 24px 80px; }
+  .role-grid { grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); }
+}
+</style>
+</head>
+<body>
+
+<header class="app-header">
+  <div class="app-logo">新田創意整合 <span>｜</span> 接案系統</div>
+  <div class="app-badge">v1.0</div>
+</header>
+
+<div class="step-bar" id="stepBar">
+  <button class="step-btn active" onclick="gS(1)"><div class="step-dot">1</div>客戶資訊</button>
+  <button class="step-btn" onclick="gS(2)"><div class="step-dot">2</div>需求確認</button>
+  <button class="step-btn" onclick="gS(3)"><div class="step-dot">3</div>預算規模</button>
+  <button class="step-btn" onclick="gS(4)"><div class="step-dot">4</div>組建小組</button>
+  <button class="step-btn" onclick="gS(5)"><div class="step-dot">5</div>提案摘要</button>
+</div>
+<div class="prog-wrap"><div class="prog-fill" id="prog" style="width:20%"></div></div>
+
+<div class="content">
+
+  <!-- ── STEP 1 ── -->
+  <div id="p1" class="panel active">
+    <div class="sec-title">客戶基本資訊</div>
+    <div class="sec-sub">填入這次接洽的客戶資料</div>
+
+    <div class="field">
+      <label>客戶名稱 / 單位</label>
+      <input type="text" id="cname" placeholder="例：板橋區農會、XX企業股份有限公司">
+    </div>
+    <div class="row2">
+      <div class="field"><label>聯絡人</label><input type="text" id="contact" placeholder="姓名"></div>
+      <div class="field"><label>電話 / LINE</label><input type="text" id="phone" placeholder="0912-000-000"></div>
+    </div>
+    <div class="row2">
+      <div class="field"><label>接洽日期</label><input type="date" id="cdate"></div>
+      <div class="field"><label>活動預計日期</label><input type="date" id="edate"></div>
+    </div>
+    <div class="field">
+      <label>客戶來源</label>
+      <div class="chip-group" id="g-src">
+        <span class="chip" onclick="tC(this,'src')">朋友介紹</span>
+        <span class="chip" onclick="tC(this,'src')">農會人脈</span>
+        <span class="chip" onclick="tC(this,'src')">社群媒體</span>
+        <span class="chip" onclick="tC(this,'src')">自行找來</span>
+        <span class="chip" onclick="tC(this,'src')">舊客回頭</span>
+        <span class="chip" onclick="tC(this,'src')">其他</span>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-next" onclick="gS(2)">下一步 →</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 2 ── -->
+  <div id="p2" class="panel">
+    <div class="sec-title">活動需求</div>
+    <div class="sec-sub">了解客戶想辦什麼活動</div>
+
+    <div class="field">
+      <label>活動主題（暫定）</label>
+      <input type="text" id="etitle" placeholder="例：夏日芒果節、農遊市集、品牌發表會">
+    </div>
+    <div class="field">
+      <label>活動目的（可複選）</label>
+      <div class="chip-group" id="g-goal">
+        <span class="chip" onclick="tC(this,'goal')">品牌曝光</span>
+        <span class="chip" onclick="tC(this,'goal')">農產品促銷</span>
+        <span class="chip" onclick="tC(this,'goal')">媒體宣傳</span>
+        <span class="chip" onclick="tC(this,'goal')">民眾互動</span>
+        <span class="chip" onclick="tC(this,'goal')">招募會員</span>
+        <span class="chip" onclick="tC(this,'goal')">ESG形象</span>
+        <span class="chip" onclick="tC(this,'goal')">社群內容</span>
+        <span class="chip" onclick="tC(this,'goal')">政策宣導</span>
+        <span class="chip" onclick="tC(this,'goal')">節慶活動</span>
+        <span class="chip" onclick="tC(this,'goal')">企業合作</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>活動形式（可複選）</label>
+      <div class="chip-group" id="g-type">
+        <span class="chip" onclick="tC(this,'type')">展售市集</span>
+        <span class="chip" onclick="tC(this,'type')">舞台活動</span>
+        <span class="chip" onclick="tC(this,'type')">記者會</span>
+        <span class="chip" onclick="tC(this,'type')">DIY體驗</span>
+        <span class="chip" onclick="tC(this,'type')">試吃互動</span>
+        <span class="chip" onclick="tC(this,'type')">打卡拍照</span>
+        <span class="chip" onclick="tC(this,'type')">講座分享</span>
+        <span class="chip" onclick="tC(this,'type')">抽獎活動</span>
+        <span class="chip" onclick="tC(this,'type')">表演節目</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>活動風格</label>
+      <div class="chip-group" id="g-style">
+        <span class="chip" onclick="tC(this,'style')">文青感</span>
+        <span class="chip" onclick="tC(this,'style')">熱鬧市集</span>
+        <span class="chip" onclick="tC(this,'style')">高質感品牌</span>
+        <span class="chip" onclick="tC(this,'style')">親子歡樂</span>
+        <span class="chip" onclick="tC(this,'style')">農村自然</span>
+        <span class="chip" onclick="tC(this,'style')">節慶喜氣</span>
+        <span class="chip" onclick="tC(this,'style')">政府正式</span>
+        <span class="chip" onclick="tC(this,'style')">年輕潮流</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>目標對象</label>
+      <div class="chip-group" id="g-target">
+        <span class="chip" onclick="tC(this,'target')">一般民眾</span>
+        <span class="chip" onclick="tC(this,'target')">親子家庭</span>
+        <span class="chip" onclick="tC(this,'target')">長輩族群</span>
+        <span class="chip" onclick="tC(this,'target')">年輕族群</span>
+        <span class="chip" onclick="tC(this,'target')">媒體記者</span>
+        <span class="chip" onclick="tC(this,'target')">農民小農</span>
+        <span class="chip" onclick="tC(this,'target')">企業VIP</span>
+        <span class="chip" onclick="tC(this,'target')">KOL網紅</span>
+      </div>
+    </div>
+    <div class="field">
+      <label>特殊需求或備註</label>
+      <textarea id="notes" placeholder="例：長官出席、需要直播、主視覺偏年輕化..."></textarea>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="gS(1)">← 上一步</button>
+      <button class="btn btn-next" onclick="gS(3)">下一步 →</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 3 ── -->
+  <div id="p3" class="panel">
+    <div class="sec-title">預算與規模</div>
+    <div class="sec-sub">確認活動量級，才能對的起提案</div>
+
+    <div class="field">
+      <label>預算範圍</label>
+      <div class="budget-grid">
+        <div class="bcard" onclick="sB(this,'5萬以內')"><div class="b-amt">5萬以內</div><div class="b-desc">小型 / 單日</div></div>
+        <div class="bcard" onclick="sB(this,'5～10萬')"><div class="b-amt">5～10萬</div><div class="b-desc">中型活動</div></div>
+        <div class="bcard" onclick="sB(this,'10～30萬')"><div class="b-amt">10～30萬</div><div class="b-desc">大型活動</div></div>
+        <div class="bcard" onclick="sB(this,'30萬以上')"><div class="b-amt">30萬以上</div><div class="b-desc">專案 / 長期合作</div></div>
+      </div>
+    </div>
+    <div class="row2">
+      <div class="field">
+        <label>預估參與人數</label>
+        <select id="headcount">
+          <option value="">請選擇</option>
+          <option>100人以下</option>
+          <option>100～300人</option>
+          <option>300～500人</option>
+          <option>500～1000人</option>
+          <option>1000人以上</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>活動天數</label>
+        <select id="days">
+          <option value="">請選擇</option>
+          <option>半天</option>
+          <option>1天</option>
+          <option>2天</option>
+          <option>3天以上</option>
+        </select>
+      </div>
+    </div>
+    <div class="field">
+      <label>行銷宣傳需求（可複選）</label>
+      <div class="chip-group" id="g-mkt">
+        <span class="chip" onclick="tC(this,'mkt')">FB/IG貼文</span>
+        <span class="chip" onclick="tC(this,'mkt')">短影音Reels</span>
+        <span class="chip" onclick="tC(this,'mkt')">活動Banner</span>
+        <span class="chip" onclick="tC(this,'mkt')">新聞稿</span>
+        <span class="chip" onclick="tC(this,'mkt')">媒體邀請</span>
+        <span class="chip" onclick="tC(this,'mkt')">KOL合作</span>
+        <span class="chip" onclick="tC(this,'mkt')">活動直播</span>
+        <span class="chip" onclick="tC(this,'mkt')">EDM電子報</span>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="gS(2)">← 上一步</button>
+      <button class="btn btn-next" onclick="gS(4)">下一步 →</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 4 ── -->
+  <div id="p4" class="panel">
+    <div class="sec-title">組建執行小組</div>
+    <div class="sec-sub">我只負責企劃統籌，其他角色都需外包，依需求勾選</div>
+
+    <div class="role-grid" id="g-roles">
+      <div class="rcard sel locked" data-role="企劃統籌" data-you="1">
+        <div class="r-title">🎯 企劃統籌 <span class="you-badge">我</span></div>
+        <div class="r-desc">規劃、客戶溝通、流程</div>
+      </div>
+      <div class="rcard" onclick="tR(this)" data-role="靜態攝影">
+        <div class="r-title">📷 靜態攝影</div>
+        <div class="r-desc">活動紀錄、商品拍攝</div>
+      </div>
+      <div class="rcard" onclick="tR(this)" data-role="動態錄影">
+        <div class="r-title">🎬 動態錄影</div>
+        <div class="r-desc">錄影、剪輯後製</div>
+      </div>
+      <div class="rcard" onclick="tR(this)" data-role="平面設計">
+        <div class="r-title">🎨 平面設計</div>
+        <div class="r-desc">主視覺、DM、Banner</div>
+      </div>
+      <div class="rcard" onclick="tR(this)" data-role="主持人">
+        <div class="r-title">🎤 主持人</div>
+        <div class="r-desc">舞台主持、活動帶動</div>
+      </div>
+      <div class="rcard" onclick="tR(this)" data-role="舞台音響">
+        <div class="r-title">🔊 舞台音響</div>
+        <div class="r-desc">音控、硬體搭設</div>
+      </div>
+      <div class="rcard" onclick="tR(this)" data-role="空拍攝影">
+        <div class="r-title">🚁 空拍攝影</div>
+        <div class="r-desc">無人機空拍</div>
+      </div>
+      <div class="rcard" onclick="tR(this)" data-role="現場執行">
+        <div class="r-title">🏃 現場執行</div>
+        <div class="r-desc">工作人員、現場協調</div>
+      </div>
+      <div class="rcard" onclick="tR(this)" data-role="網路行銷">
+        <div class="r-title">🌐 網路行銷</div>
+        <div class="r-desc">社群操作、廣告投放</div>
+      </div>
+      <div class="rcard" onclick="tR(this)" data-role="公關媒體">
+        <div class="r-title">📰 公關媒體</div>
+        <div class="r-desc">媒體聯絡、新聞稿</div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-back" onclick="gS(3)">← 上一步</button>
+      <button class="btn btn-generate" onclick="bR()">✦ 產出提案摘要</button>
+    </div>
+  </div>
+
+  <!-- ── STEP 5 ── -->
+  <div id="p5" class="panel">
+    <div class="sec-title">提案摘要</div>
+    <div class="sec-sub">填完整後複製文字，貼給 Claude 延伸提案</div>
+
+    <div class="rc">
+      <div class="rc-head">
+        <div class="rc-icon">🏢</div>
+        <div><div class="rc-title" id="r-client">—</div><div class="rc-sub" id="r-dates">—</div></div>
+      </div>
+      <div id="r-summary"></div>
+    </div>
+
+    <div class="rc">
+      <div class="rc-head">
+        <div class="rc-icon">🎯</div>
+        <div><div class="rc-title">活動定位</div><div class="rc-sub" id="r-pos">—</div></div>
+      </div>
+      <div id="r-tags" style="margin-top:8px"></div>
+    </div>
+
+    <div class="rc">
+      <div class="rc-head">
+        <div class="rc-icon">👥</div>
+        <div><div class="rc-title">執行小組</div><div class="rc-sub" id="r-tcount">—</div></div>
+      </div>
+      <div id="r-team"></div>
+    </div>
+
+    <div class="rc">
+      <div class="rc-head">
+        <div class="rc-icon">✅</div>
+        <div><div class="rc-title">接下來的步驟</div><div class="rc-sub">建議按序執行</div></div>
+      </div>
+      <div id="r-next"></div>
+    </div>
+
+    <div style="margin-top:16px">
+      <div style="font-size:11px;color:var(--ink4);margin-bottom:8px;text-align:center;text-transform:uppercase;letter-spacing:0.06em">複製以下文字，貼給 Claude 繼續提案</div>
+      <div id="copy-box" style="background:var(--surface2);border:1px solid var(--border2);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--ink3);line-height:1.7;white-space:pre-wrap;word-break:break-all;max-height:180px;overflow-y:auto"></div>
+      <button class="send-btn" onclick="copyText()" id="copy-btn" style="margin-top:8px">複製提案摘要</button>
+    </div>
+
+    <div class="result-actions">
+      <button class="btn btn-back" onclick="gS(4)">← 返回修改</button>
+      <button class="btn btn-back" onclick="rAll()">↺ 重新填寫</button>
+    </div>
+  </div>
+
+</div><!-- /content -->
+
+<!-- Install banner -->
+<div class="install-banner hidden" id="installBanner">
+  <div class="install-text">
+    <div class="install-title">加入主畫面，隨時使用</div>
+    <div class="install-sub">點擊安裝，像 App 一樣開啟</div>
+  </div>
+  <button class="install-btn" onclick="installApp()">安裝</button>
+  <button class="install-close" onclick="document.getElementById('installBanner').classList.add('hidden')">×</button>
+</div>
+
+<script>
+var bv = '', sc = {}, deferredPrompt = null;
+
+function gS(n) {
+  document.querySelectorAll('.panel').forEach(function(p) { p.classList.remove('active'); });
+  document.querySelectorAll('.step-btn').forEach(function(s, i) {
+    s.classList.remove('active', 'done');
+    if (i + 1 < n) s.classList.add('done');
+  });
+  document.getElementById('p' + n).classList.add('active');
+  document.querySelectorAll('.step-btn')[n - 1].classList.add('active');
+  document.getElementById('prog').style.width = (n / 5 * 100) + '%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  var activeBtn = document.querySelectorAll('.step-btn')[n - 1];
+  activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+}
+
+function tC(el, g) {
+  el.classList.toggle('sel');
+  if (!sc[g]) sc[g] = [];
+  var v = el.textContent.trim();
+  if (el.classList.contains('sel')) {
+    if (sc[g].indexOf(v) < 0) sc[g].push(v);
+  } else {
+    sc[g] = sc[g].filter(function(x) { return x !== v; });
+  }
+}
+
+function sB(el, v) {
+  document.querySelectorAll('.bcard').forEach(function(b) { b.classList.remove('sel'); });
+  el.classList.add('sel');
+  bv = v;
+}
+
+function tR(el) {
+  if (el.classList.contains('locked')) return;
+  el.classList.toggle('sel');
+}
+
+function gC(g) { return sc[g] || []; }
+
+function bR() {
+  var cn = document.getElementById('cname').value || '（未填）';
+  var ct = document.getElementById('contact').value;
+  var cd = document.getElementById('cdate').value;
+  var ed = document.getElementById('edate').value;
+  var et = document.getElementById('etitle').value || '（未命名）';
+  var nt = document.getElementById('notes').value;
+  var hc = document.getElementById('headcount').value || '未設定';
+  var dy = document.getElementById('days').value || '未設定';
+  var goals = gC('goal'), types = gC('type'), styles = gC('style');
+  var targets = gC('target'), mkts = gC('mkt'), srcs = gC('src');
+
+  document.getElementById('r-client').textContent = cn + (ct ? '　' + ct : '');
+  var dStr = '';
+  if (cd) dStr += '接洽：' + cd;
+  if (ed) dStr += (dStr ? '　' : '') + '活動：' + ed;
+  document.getElementById('r-dates').textContent = dStr || '日期未填';
+
+  var sh = '';
+  var rows = [
+    ['活動主題', et],
+    ['預算', bv || '未設定'],
+    ['預估人數', hc],
+    ['活動天數', dy],
+    ['客戶來源', srcs.join('、') || '未填']
+  ];
+  if (nt) rows.push(['備註', nt]);
+  rows.forEach(function(r) {
+    sh += '<div class="sum-row"><span class="sum-k">' + r[0] + '</span><span class="sum-v">' + r[1] + '</span></div>';
+  });
+  document.getElementById('r-summary').innerHTML = sh;
+
+  var posStr = (styles.length ? styles[0] : '待定位') + (goals.length ? '，主打' + goals.slice(0, 2).join('＋') : '');
+  document.getElementById('r-pos').textContent = posStr;
+
+  var th = '';
+  goals.forEach(function(t) { th += '<span class="tag t-green">' + t + '</span>'; });
+  types.forEach(function(t) { th += '<span class="tag t-purple">' + t + '</span>'; });
+  targets.forEach(function(t) { th += '<span class="tag t-amber">' + t + '</span>'; });
+  mkts.forEach(function(t) { th += '<span class="tag t-teal">' + t + '</span>'; });
+  document.getElementById('r-tags').innerHTML = th || '<span style="font-size:12px;color:var(--ink4)">未選取標籤</span>';
+
+  var allR = Array.from(document.querySelectorAll('#g-roles .rcard.sel'));
+  var youR = allR.filter(function(r) { return r.dataset.you; });
+  var needR = allR.filter(function(r) { return !r.dataset.you; });
+  document.getElementById('r-tcount').textContent = '共 ' + allR.length + ' 個角色，需外包 ' + needR.length + ' 位';
+
+  var avBg = ['#E8F5E9','#EDE7F6','#FFF8E1','#E0F2F1','#FBE9E7'];
+  var avTc = ['#1B5E20','#4527A0','#F57F17','#00695C','#BF360C'];
+  var tm = '';
+  youR.forEach(function(r) {
+    tm += '<div class="mrow"><div class="av" style="background:#E8F5E9;color:#1B5E20">偉</div><div class="m-info" style="flex:1"><div class="m-name">高偉哲</div><div class="m-role">' + r.dataset.role + '</div></div><span class="m-badge m-you">負責人</span></div>';
+  });
+  needR.forEach(function(r, i) {
+    var ci = i % 5;
+    var ini = r.dataset.role.charAt(0);
+    tm += '<div class="mrow"><div class="av" style="background:' + avBg[ci] + ';color:' + avTc[ci] + '">' + ini + '</div><div class="m-info" style="flex:1"><div class="m-name">' + r.dataset.role + '</div><div class="m-role">待確認人選</div></div><span class="m-badge m-need">待招募</span></div>';
+  });
+  document.getElementById('r-team').innerHTML = tm;
+
+  var steps = ['寄送需求確認單，請客戶確認', '產出初步提案（主題＋區域規劃）', '安排第一次提案會議', '確認預算，簽訂合作合約', '招募所需外包人員', '建立 LINE 群組，啟動執行會議'];
+  var nx = '';
+  steps.forEach(function(s, i) {
+    nx += '<div class="step-item"><div class="step-num">' + (i + 1) + '</div><span>' + s + '</span></div>';
+  });
+  document.getElementById('r-next').innerHTML = nx;
+
+  var allRoles = Array.from(document.querySelectorAll('#g-roles .rcard.sel')).map(function(r) { return r.dataset.role; });
+  var copyStr = '請幫我針對以下案子延伸提案內容：\n\n客戶：' + cn + '\n活動主題：' + et + '\n預算：' + (bv || '未設定') + '\n人數：' + hc + '，天數：' + dy + '\n活動目的：' + (goals.join('、') || '未選') + '\n活動形式：' + (types.join('、') || '未選') + '\n目標對象：' + (targets.join('、') || '未選') + '\n活動風格：' + (styles.join('、') || '未選') + '\n行銷需求：' + (mkts.join('、') || '未選') + '\n小組角色：' + allRoles.join('、') + '\n備註：' + (nt || '無') + '\n\n請幫我：\n1. 建議 3 個活動主題方向（含主題名稱、定位、核心亮點）\n2. 規劃活動區域（參考新田企劃模板）\n3. 列出提案會議前需確認的關鍵問題';
+  document.getElementById('copy-box').textContent = copyStr;
+
+  gS(5);
+}
+
+function copyText() {
+  var txt = document.getElementById('copy-box').textContent;
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(txt).then(function() {
+      var btn = document.getElementById('copy-btn');
+      btn.textContent = '✓ 已複製！';
+      setTimeout(function() { btn.textContent = '複製提案摘要'; }, 2000);
+    });
+  } else {
+    var ta = document.createElement('textarea');
+    ta.value = txt;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    var btn = document.getElementById('copy-btn');
+    btn.textContent = '✓ 已複製！';
+    setTimeout(function() { btn.textContent = '複製提案摘要'; }, 2000);
+  }
+}
+
+function rAll() {
+  document.querySelectorAll('input[type=text],input[type=date],textarea').forEach(function(el) { el.value = ''; });
+  document.querySelectorAll('select').forEach(function(el) { el.selectedIndex = 0; });
+  document.querySelectorAll('.chip.sel').forEach(function(el) { el.classList.remove('sel'); });
+  document.querySelectorAll('.bcard.sel').forEach(function(el) { el.classList.remove('sel'); });
+  document.querySelectorAll('#g-roles .rcard:not(.locked)').forEach(function(el) { el.classList.remove('sel'); });
+  bv = ''; sc = {};
+  gS(1);
+}
+
+window.addEventListener('beforeinstallprompt', function(e) {
+  e.preventDefault();
+  deferredPrompt = e;
+  document.getElementById('installBanner').classList.remove('hidden');
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function() {
+      deferredPrompt = null;
+      document.getElementById('installBanner').classList.add('hidden');
+    });
+  }
+}
+
+window.addEventListener('appinstalled', function() {
+  document.getElementById('installBanner').classList.add('hidden');
+});
+</script>
+</body>
+</html>
